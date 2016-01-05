@@ -9,14 +9,13 @@
  Dark parts of the image have larger amplitudes.
  The result is being writen to a PDF for refinement in Illustrator/Inkscape
  
- Version 1.0
+ Version 1.0 Buggy PDF export
+         1.1 added SVG export and flag to swith off PDF export
  
  Todo:
- - Output has to be cleaned (PDF writer writes more than I want)
- - Paths are filled with white
- - A duplicate invisible path is being written
- - A mask is beeing written
- 
+   - Choose centerpoint with mouse or in code
+   - Remove PDF export completely
+  
  SpiralfromImage is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,7 +26,7 @@
  
  jan@krummrey.de
  http://jan.krummrey.de
-*/
+ */
 
 import processing.pdf.*;
 
@@ -47,6 +46,8 @@ float ampScale = 2.4;                      // Controls the amplitude
 float x, y, xa, ya, xb, yb, k;
 float endRadius;
 color mask = color (255, 255, 255);        // This color will not be drawn
+PrintWriter output;                        // Output stream for SVG Export
+boolean exportPDF = false;                 // Also export a PDF
 
 void setup() {
   size(1024, 1024);
@@ -60,9 +61,6 @@ void setup() {
   } else {
     sourceImg.resize (0, 1024);
   }
-  beginRecord( PDF, "output.pdf");
-  beginShape ();
-  shapeOn = true;
 
   //when have we reached the far corner of the image?
   endRadius = sqrt(pow((sourceImg.width/2), 2)+pow((sourceImg.height/2), 2));
@@ -74,7 +72,14 @@ void setup() {
   radius += dist/(360/k);
   x =  aradius*cos(radians(alpha))+sourceImg.width/2;
   y = -aradius*sin(radians(alpha))+sourceImg.height/2;
+
+if (exportPDF) beginRecord( PDF, "output.pdf");
+if (exportPDF)   beginShape ();
+  shapeOn = true;
   vertex (x, y);
+  openSVG ();
+  openPolyline();
+  vertexPolyline(x, y);
 }
 void draw() {
   // Have we reached the far corner of the image?
@@ -110,33 +115,75 @@ void draw() {
 
       // If the sampled color is the mask color do not write to the shape
       if (mask == c) {
-        endShape ();
+        if (exportPDF) endShape ();
+        if (shapeOn) {
+          closePolyline ();
+          output.println("<!-- Mask -->");
+        }
         shapeOn = false;
       } else {
         // Add vertices to shape
         if (shapeOn == false) {
-          beginShape ();
+          if (exportPDF) beginShape ();
+          openPolyline ();
           shapeOn = true;
         }
         vertex (xa, ya);
         vertex (xb, yb);
+        vertexPolyline (xa, ya);
+        vertexPolyline (xb, yb);
       }
 
       // If the shape has gotten too long close it and open a new one
-      if (counter%shapeLen == 0) {
-        endShape();
-        beginShape ();
+      if (counter%shapeLen == 0 && shapeOn) {
+        if (exportPDF) endShape ();
+        closePolyline ();
+        output.println("<!-- Max ShapeLen -->");
+        if (exportPDF) beginShape ();
+        openPolyline ();
       }
     } else {
 
       // We are outside of the image so close the shape if it is open
       if (shapeOn == true) {
-        endShape ();
+        if (exportPDF) endShape ();
+        closePolyline ();
+        output.println("<!-- Out of bounds -->");
         shapeOn = false;
       }
     }
   }
-  endShape();
-  endRecord();
+  if (exportPDF) endShape();
+  if (exportPDF) endRecord();
+  if (shapeOn) closePolyline();
+  closeSVG ();
+  exit();
 }
 
+void openSVG () {
+  output = createWriter("output.svg"); 
+  output.println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+  output.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">");
+  output.println("<svg width=\"px\" height=\"px\" viewBox=\"0 0 1200 400\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">");
+}
+
+void openPolyline () {
+  output.println("  <polyline fill=\"none\" stroke=\"#000000\" points=\"");
+}
+
+void vertexPolyline (float x, float y) {
+  output.print("    ");
+  output.print(x);
+  output.print(",");
+  output.println(y);
+}
+
+void closePolyline () {
+  output.println("  \" />");
+}
+
+void closeSVG () {
+  output.println("</svg>");
+  output.flush(); // Writes the remaining data to the file
+  output.close(); // Finishes the file
+}
