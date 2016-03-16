@@ -54,7 +54,7 @@ float alpha = 0;                           // Initial rotation
 float density = 75;                        // Density
 int counter=0;                             // Counts the samples
 float ampScale = 2.4;                      // Controls the amplitude
-float x, y, xa, ya, xb, yb,                // current X and y + jittered x and y 
+float x, y, xa, ya, xb, yb;                // current X and y + jittered x and y 
 float k;                                   // current radius
 float endRadius;                           // Largest value the spiral needs to cover the image
 color mask = color (255, 255, 255);        // This color will not be drawn (WHITE)
