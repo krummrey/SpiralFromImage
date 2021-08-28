@@ -252,7 +252,7 @@ void drawSVG() {
 
     // Are we within the the image?
     // If so check if the shape is open. If not, open it
-    if ((x>=0.0) && (x<sourceImg.width) && (y>0.0) && (y<sourceImg.height)) {
+    if ((x>=0) && (x<sourceImg.width) && (y>=0) && (y<sourceImg.height)) {
 
       // Get the color and brightness of the sampled pixel
       c = sourceImg.get (int(x), int(y));
