@@ -19,6 +19,10 @@ void openPolyline () {
 void vertexPolyline (float x, float y) {
   // If the shape has gotten too long close it and open a new one
   if (shapeCount%shapeLen == 0 && shapeOn) {
+    output.print("    ");
+    output.print(x);
+    output.print(",");
+    output.println(y);
     endShape ();
     closePolyline ();
     output.println("<!-- Maximum Shape Length -->");
