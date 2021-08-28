@@ -18,7 +18,6 @@
  Todo:
  - Choose centerpoint with mouse or numeric input
  - remove unused variable
- - fix display of generated SVG
  - preview of spiral and amplitude changes in gui
  - remove clear display ( you either reload an image or quit? )
  
@@ -171,7 +170,6 @@ public void Draw(int theValue) {
 // Rework to save in the same folder as original image
     outputSVGName=imageName+".svg";
     drawSVG();
-// Doesn't work
     displaySVG();
   }
 }
@@ -330,14 +328,12 @@ void resizedisplayImg() {
   }
 }
 
-// Doesn't work for me. Filename issue?
 void displaySVG () {
   clearDisplay();
-  String svgLocation = sketchPath("")+""+"\\"+imageName+".svg";
+  String svgLocation = imageName + ".svg";
   outputSVG = loadShape(svgLocation);
-  println("loaded SVG: "+sketchPath("")+"Output"+"\\"+outputSVGName+".svg");
   shape(outputSVG, 187, 85, outputSVG.width/2, outputSVG.height/2);
-  feedbackText.setText(locImg+" was processed and saved as "+outputSVGName);
+  feedbackText.setText(locImg+" was processed and saved as "+sketchPath(outputSVGName));
   feedbackText.update();
 }
 
