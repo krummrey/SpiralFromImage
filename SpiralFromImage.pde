@@ -42,18 +42,9 @@ Textarea feedbackText;
 String locImg = "";                        // Source image absolute location
 PImage sourceImg;                          // Source image for svg conversion
 PImage displayImg;                         // Image to use as display
-color c;                                   // Sampled color
-float b;                                   // Sampled brightness
 float dist = 5;                            // Distance between rings
-float radius = dist/2;                     // Current radius
-float aradius;                             // Radius with brighness applied up
-float bradius;                             // Radius with brighness applied down
-float alpha = 0;                           // Initial rotation
 float density = 75;                        // Density
-int counter=0;                             // Counts the samples
 float ampScale = 2.4;                      // Controls the amplitude
-float x, y, xa, ya, xb, yb;                // current X and y + jittered x and y 
-float k;                                   // current radius
 float endRadius;                           // Largest value the spiral needs to cover the image
 color mask = color (255, 255, 255);        // This color will not be drawn (WHITE)
 PShape outputSVG;                          // SVG shape to draw
@@ -225,15 +216,21 @@ void fileSelected(File selection) {
 
 // Function to creatve SVG file from loaded image file - Transparencys currently do not work as a mask colour
 void drawSVG() {
+  color c;                                   // Sampled color
+  float b;                                   // Sampled brightness
+  float radius = dist/2;                     // Current radius
+  float aradius;                             // Radius with brighness applied up
+  float bradius;                             // Radius with brighness applied down
+  float alpha;                               // Initial rotation
+  float x, y, xa, ya, xb, yb;                // current X and y + jittered x and y 
+  float k;                                   // current radius
 
   // Calculates the first point
   // currently just the center
   // TODO: create button to set center with mouse
-  k = density/(dist/2);
+  k = density/radius;
   alpha = k;
-  radius = dist/(360/k);
-  x =  aradius*cos(radians(alpha))+sourceImg.width/2;
-  y = -aradius*sin(radians(alpha))+sourceImg.height/2;
+  radius += dist/(360/k);
 
   // when have we reached the far corner of the image?
   // TODO: this will have to change if not centered
