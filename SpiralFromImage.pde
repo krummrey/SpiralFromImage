@@ -332,7 +332,7 @@ void displaySVG () {
   clearDisplay();
   String svgLocation = imageName + ".svg";
   outputSVG = loadShape(svgLocation);
-  shape(outputSVG, 187, 85, outputSVG.width/2, outputSVG.height/2);
+  shape(outputSVG, 187, 85, 512, 512 * outputSVG.width / outputSVG.height);
   feedbackText.setText(locImg+" was processed and saved as "+sketchPath(outputSVGName));
   feedbackText.update();
 }
