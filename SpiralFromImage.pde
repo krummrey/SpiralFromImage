@@ -17,7 +17,6 @@
      
  Todo:
  - Choose centerpoint with mouse or numeric input
- - remove unused variable
  - preview of spiral and amplitude changes in gui
  - remove clear display ( you either reload an image or quit? )
  
@@ -58,11 +57,8 @@ float k;                                   // current radius
 float endRadius;                           // Largest value the spiral needs to cover the image
 color mask = color (255, 255, 255);        // This color will not be drawn (WHITE)
 PShape outputSVG;                          // SVG shape to draw
-int c1, c2;                                // REMOVE ???
-float n, n1;                               // REMOVE ??
 String outputSVGName;                      // Filename of the generated SVG
 String imageName;                          // Filename of the loaded image
-String imagePath;                          // Path of the loaded image (not used yet)
 
 
 void setup() {
@@ -149,7 +145,6 @@ void setup() {
 //Button control event handler
 public void controlEvent(ControlEvent theEvent) {
   println(theEvent.getController().getName());
-  n = 0;
 }
 
 // Button Event - Open: Open image file dialogue
@@ -234,9 +229,9 @@ void drawSVG() {
   // Calculates the first point
   // currently just the center
   // TODO: create button to set center with mouse
-  k = density/radius ;
-  alpha += k;
-  radius += dist/(360/k);
+  k = density/(dist/2);
+  alpha = k;
+  radius = dist/(360/k);
   x =  aradius*cos(radians(alpha))+sourceImg.width/2;
   y = -aradius*sin(radians(alpha))+sourceImg.height/2;
 
@@ -257,7 +252,7 @@ void drawSVG() {
 
     // Are we within the the image?
     // If so check if the shape is open. If not, open it
-    if ((x>=0) && (x<sourceImg.width) && (y>00) && (y<sourceImg.height)) {
+    if ((x>=0.0) && (x<sourceImg.width) && (y>0.0) && (y<sourceImg.height)) {
 
       // Get the color and brightness of the sampled pixel
       c = sourceImg.get (int(x), int(y));
