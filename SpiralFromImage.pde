@@ -17,8 +17,6 @@
      
  Todo:
  - Choose centerpoint with mouse or numeric input
- - remove unused variable
- - fix display of generated SVG
  - preview of spiral and amplitude changes in gui
  - remove clear display ( you either reload an image or quit? )
  
@@ -44,26 +42,14 @@ Textarea feedbackText;
 String locImg = "";                        // Source image absolute location
 PImage sourceImg;                          // Source image for svg conversion
 PImage displayImg;                         // Image to use as display
-color c;                                   // Sampled color
-float b;                                   // Sampled brightness
 float dist = 5;                            // Distance between rings
-float radius = dist/2;                     // Current radius
-float aradius;                             // Radius with brighness applied up
-float bradius;                             // Radius with brighness applied down
-float alpha = 0;                           // Initial rotation
 float density = 75;                        // Density
-int counter=0;                             // Counts the samples
 float ampScale = 2.4;                      // Controls the amplitude
-float x, y, xa, ya, xb, yb;                // current X and y + jittered x and y 
-float k;                                   // current radius
 float endRadius;                           // Largest value the spiral needs to cover the image
 color mask = color (255, 255, 255);        // This color will not be drawn (WHITE)
 PShape outputSVG;                          // SVG shape to draw
-int c1, c2;                                // REMOVE ???
-float n, n1;                               // REMOVE ??
 String outputSVGName;                      // Filename of the generated SVG
 String imageName;                          // Filename of the loaded image
-String imagePath;                          // Path of the loaded image (not used yet)
 
 
 void setup() {
@@ -150,7 +136,6 @@ void setup() {
 //Button control event handler
 public void controlEvent(ControlEvent theEvent) {
   println(theEvent.getController().getName());
-  n = 0;
 }
 
 // Button Event - Open: Open image file dialogue
@@ -171,7 +156,6 @@ public void Draw(int theValue) {
 // Rework to save in the same folder as original image
     outputSVGName=imageName+".svg";
     drawSVG();
-// Doesn't work
     displaySVG();
   }
 }
@@ -232,15 +216,21 @@ void fileSelected(File selection) {
 
 // Function to creatve SVG file from loaded image file - Transparencys currently do not work as a mask colour
 void drawSVG() {
+  color c;                                   // Sampled color
+  float b;                                   // Sampled brightness
+  float radius = dist/2;                     // Current radius
+  float aradius;                             // Radius with brighness applied up
+  float bradius;                             // Radius with brighness applied down
+  float alpha;                               // Initial rotation
+  float x, y, xa, ya, xb, yb;                // current X and y + jittered x and y 
+  float k;                                   // current radius
 
   // Calculates the first point
   // currently just the center
   // TODO: create button to set center with mouse
-  k = density/radius ;
-  alpha += k;
+  k = density/radius;
+  alpha = k;
   radius += dist/(360/k);
-  x =  aradius*cos(radians(alpha))+sourceImg.width/2;
-  y = -aradius*sin(radians(alpha))+sourceImg.height/2;
 
   // when have we reached the far corner of the image?
   // TODO: this will have to change if not centered
@@ -259,7 +249,7 @@ void drawSVG() {
 
     // Are we within the the image?
     // If so check if the shape is open. If not, open it
-    if ((x>=0) && (x<sourceImg.width) && (y>00) && (y<sourceImg.height)) {
+    if ((x>=0) && (x<sourceImg.width) && (y>=0) && (y<sourceImg.height)) {
 
       // Get the color and brightness of the sampled pixel
       c = sourceImg.get (int(x), int(y));
@@ -330,14 +320,12 @@ void resizedisplayImg() {
   }
 }
 
-// Doesn't work for me. Filename issue?
 void displaySVG () {
   clearDisplay();
-  String svgLocation = sketchPath("")+""+"\\"+imageName+".svg";
+  String svgLocation = imageName + ".svg";
   outputSVG = loadShape(svgLocation);
-  println("loaded SVG: "+sketchPath("")+"Output"+"\\"+outputSVGName+".svg");
-  shape(outputSVG, 187, 85, outputSVG.width/2, outputSVG.height/2);
-  feedbackText.setText(locImg+" was processed and saved as "+outputSVGName);
+  shape(outputSVG, 187, 85, 512, 512 * outputSVG.width / outputSVG.height);
+  feedbackText.setText(locImg+" was processed and saved as "+sketchPath(outputSVGName));
   feedbackText.update();
 }
 
